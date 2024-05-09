@@ -1,4 +1,5 @@
 import Phaser from '../lib/phaser.js';
+import Carrot from '../Game/carrot.js';
 
 
 export default class Game extends Phaser.Scene {
@@ -11,7 +12,8 @@ export default class Game extends Phaser.Scene {
             this.load.image('background', 'assets/PNG/Background/bg_layer1.png')
             this.load.image('platform', "assets/PNG/Environment/ground_grass.png")
             this.load.image('bunny-stand', 'assets/PNG/Player/bunny1_stand.png')
-            this.cursors = this.input.keyboard.createCursorKeys()
+            this.cursors = this.input.keyboard.createCursorKeys();
+            this.load.image('carrot', 'assets/PNG/items/carrot.png');
         }
         /** @type {Phaser.Physics.Arcade.Sprite} */
     player
@@ -19,8 +21,7 @@ export default class Game extends Phaser.Scene {
     platforms
 
     create() {
-        this.add.image(240, 320, 'background')
-            .setScrollFactor(1.0);
+        this.add.image(240, 320, 'background').setScrollFactor(1, 0);
         this.platforms = this.physics.add.staticGroup();
 
         for (let i = 0; i < 5; ++i) {
@@ -44,6 +45,7 @@ export default class Game extends Phaser.Scene {
         this.player.body.checkCollision.left = false;
 
         this.cameras.main.startFollow(this.player);
+        this.cameras.main.setDeadzone(this.scale.width * 1.5);
     }
     update(t, td) {
 
@@ -68,6 +70,19 @@ export default class Game extends Phaser.Scene {
             this.player.setVelocityX(200);
         } else {
             this.player.setAccelerationX(0)
+        }
+
+        this.horizontalWrap(this.player)
+    }
+    horizontalWrap(sprite) {
+
+        const halfWidth = sprite.displayWidth * 0.5;
+        const gameWidth = this.scale.width;
+
+        if (sprite.x < -halfWidth) {
+            sprite.x = gameWidth + halfWidth;
+        } else if (sprite.x > gameWidth + halfWidth) {
+            sprite.x = -halfWidth;
         }
     }
 }
