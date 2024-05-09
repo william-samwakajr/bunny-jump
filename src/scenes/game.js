@@ -3,19 +3,24 @@ import Phaser from '../lib/phaser.js';
 
 export default class Game extends Phaser.Scene {
     constructor() {
-        super('game');
-    }
+            super('game');
+        }
+        /**  @type {Phaser.Types.Input.Keyboard.CursorKeys} */
+    cursors
     preload() {
             this.load.image('background', 'assets/PNG/Background/bg_layer1.png')
             this.load.image('platform', "assets/PNG/Environment/ground_grass.png")
             this.load.image('bunny-stand', 'assets/PNG/Player/bunny1_stand.png')
+            this.cursors = this.input.keyboard.createCursorKeys()
         }
         /** @type {Phaser.Physics.Arcade.Sprite} */
     player
     /**  @type {Phaser.Physics.Arcade.Sprite} */
     platforms
+
     create() {
-        this.add.image(240, 320, 'background');
+        this.add.image(240, 320, 'background')
+            .setScrollFactor(1.0);
         this.platforms = this.physics.add.staticGroup();
 
         for (let i = 0; i < 5; ++i) {
@@ -40,16 +45,29 @@ export default class Game extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player);
     }
-    update() {
+    update(t, td) {
 
         this.platforms.children.iterate(child => {
             const platform = child;
 
-            const scroll
+            const scrollY = this.cameras.main.scrollY
+            if (platform.y >= scrollY + 700) {
+
+                platform.y = scrollY - Phaser.Math.Between(50, 100);
+                platform.body.updateFromGameObject();
+            }
         })
+
         const touchingDown = this.player.body.touching.down;
         if (touchingDown) {
-            this.player.setVelocityY(-300);
+            this.player.setVelocityY(-400);
+        }
+        if (this.cursors.left.isDown && !touchingDown) {
+            this.player.setVelocityX(-200);
+        } else if (this.cursors.right.isDown && !touchingDown) {
+            this.player.setVelocityX(200);
+        } else {
+            this.player.setAccelerationX(0)
         }
     }
 }
