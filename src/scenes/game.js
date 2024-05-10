@@ -12,13 +12,16 @@ export default class Game extends Phaser.Scene {
             this.load.image('background', 'assets/PNG/Background/bg_layer1.png')
             this.load.image('platform', "assets/PNG/Environment/ground_grass.png")
             this.load.image('bunny-stand', 'assets/PNG/Player/bunny1_stand.png')
-            this.cursors = this.input.keyboard.createCursorKeys();
             this.load.image('carrot', 'assets/PNG/items/carrot.png');
+            this.cursors = this.input.keyboard.createCursorKeys();
+
         }
         /** @type {Phaser.Physics.Arcade.Sprite} */
     player
     /**  @type {Phaser.Physics.Arcade.Sprite} */
     platforms
+    /** @type {Phaser,Physics.Arcade.Group} */
+    carrots
 
     create() {
         this.add.image(240, 320, 'background').setScrollFactor(1, 0);
@@ -46,6 +49,12 @@ export default class Game extends Phaser.Scene {
 
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setDeadzone(this.scale.width * 1.5);
+
+        this.carrots = this.physics.add.group({
+                classType: Carrot
+            })
+            // this.carrots.get(240, 320, 'carrot');
+        this.physics.add.collider(this.platforms, this.carrots)
     }
     update(t, td) {
 
@@ -57,12 +66,14 @@ export default class Game extends Phaser.Scene {
 
                 platform.y = scrollY - Phaser.Math.Between(50, 100);
                 platform.body.updateFromGameObject();
+
+                this.addCarrotAbove(platform)
             }
         })
 
         const touchingDown = this.player.body.touching.down;
         if (touchingDown) {
-            this.player.setVelocityY(-400);
+            this.player.setVelocityY(-350);
         }
         if (this.cursors.left.isDown && !touchingDown) {
             this.player.setVelocityX(-200);
@@ -76,13 +87,25 @@ export default class Game extends Phaser.Scene {
     }
     horizontalWrap(sprite) {
 
-        const halfWidth = sprite.displayWidth * 0.5;
-        const gameWidth = this.scale.width;
+            const halfWidth = sprite.displayWidth * 0.5;
+            const gameWidth = this.scale.width;
 
-        if (sprite.x < -halfWidth) {
-            sprite.x = gameWidth + halfWidth;
-        } else if (sprite.x > gameWidth + halfWidth) {
-            sprite.x = -halfWidth;
+            if (sprite.x < -halfWidth) {
+                sprite.x = gameWidth + halfWidth;
+            } else if (sprite.x > gameWidth + halfWidth) {
+                sprite.x = -halfWidth;
+            }
         }
+        /**
+         * @param {Phaser.GameObject.Sprite} sprite
+         */
+    addCarrotAbove(sprite) {
+        const y = sprite.y - sprite.displayHeight
+            /** @type {Phaser.Physics.Arcade.Sprite} */
+        const carrot = this.carrot.get(sprite.x, y, 'carrot');
+        this.add.existing(carrot)
+        carrot.body.setSize(carrot.width, carrot.height);
+        return carrot
     }
+
 }
