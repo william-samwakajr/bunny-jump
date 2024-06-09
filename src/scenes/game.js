@@ -3,6 +3,17 @@ import Carrot from '../Game/carrot.js';
 
 
 export default class Game extends Phaser.Scene {
+    /**
+     * @param {Phaser.GameObject.Sprite} sprite
+     */
+    addCarrotAbove(sprite) {
+        const y = sprite.y - sprite.displayHeight
+            /** @type {Phaser.Physics.Arcade.Sprite} */
+        const carrot = this.carrot.get(sprite.x, y, 'carrot');
+        this.add.existing(carrot)
+        carrot.body.setSize(carrot.width, carrot.height);
+        return carrot
+    }
     constructor() {
             super('game');
         }
@@ -87,25 +98,15 @@ export default class Game extends Phaser.Scene {
     }
     horizontalWrap(sprite) {
 
-            const halfWidth = sprite.displayWidth * 0.5;
-            const gameWidth = this.scale.width;
+        const halfWidth = sprite.displayWidth * 0.5;
+        const gameWidth = this.scale.width;
 
-            if (sprite.x < -halfWidth) {
-                sprite.x = gameWidth + halfWidth;
-            } else if (sprite.x > gameWidth + halfWidth) {
-                sprite.x = -halfWidth;
-            }
+        if (sprite.x < -halfWidth) {
+            sprite.x = gameWidth + halfWidth;
+        } else if (sprite.x > gameWidth + halfWidth) {
+            sprite.x = -halfWidth;
         }
-        /**
-         * @param {Phaser.GameObject.Sprite} sprite
-         */
-    addCarrotAbove(sprite) {
-        const y = sprite.y - sprite.displayHeight
-            /** @type {Phaser.Physics.Arcade.Sprite} */
-        const carrot = this.carrot.get(sprite.x, y, 'carrot');
-        this.add.existing(carrot)
-        carrot.body.setSize(carrot.width, carrot.height);
-        return carrot
     }
+
 
 }
