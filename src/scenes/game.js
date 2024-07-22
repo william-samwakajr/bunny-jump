@@ -94,19 +94,20 @@ export default class Game extends Phaser.Scene {
             this.player.setAccelerationX(0)
         }
 
-        this.horizontalWrap(this.player)
+        // this.horizontalWrap(this.player)
     }
-    horizontalWrap(sprite) {
 
-        const halfWidth = sprite.displayWidth * 0.5;
-        const gameWidth = this.scale.width;
+    // horizontalWrap(sprite) {
 
-        if (sprite.x < -halfWidth) {
-            sprite.x = gameWidth + halfWidth;
-        } else if (sprite.x > gameWidth + halfWidth) {
-            sprite.x = -halfWidth;
-        }
-    }
+    //        const halfWidth = sprite.displayWidth * 0.5;
+    //      const gameWidth = this.scale.width;
+
+    //        if (sprite.x < -halfWidth) {
+    //          sprite.x = gameWidth + halfWidth;
+    //    } else if (sprite.x > gameWidth + halfWidth) {
+    //      sprite.x = -halfWidth;
+    //}
+    //    }
 
 
 }
