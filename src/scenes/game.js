@@ -3,7 +3,10 @@ import Carrot from '../Game/carrot.js';
 
 
 export default class Game extends Phaser.Scene {
-    carrotsCollected = 0
+    init(){
+        this.carrotsCollected = 0
+    }
+    
     /**
      * @param {Phaser.GameObject.Sprite} sprite
      */
@@ -27,6 +30,7 @@ export default class Game extends Phaser.Scene {
             this.load.image('background', 'assets/PNG/Background/bg_layer1.png')
             this.load.image('platform', "assets/PNG/Environment/ground_grass.png")
             this.load.image('bunny-stand', 'assets/PNG/Player/bunny1_stand.png')
+            this.load.image('bunny-jump','assets/PNG/Player/bunny1_jump.png    ')
             this.load.image('carrot', 'assets/PNG/items/carrot.png');
             this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -94,11 +98,20 @@ export default class Game extends Phaser.Scene {
 
                 this.addCarrotAbove(platform)
             }
+            const bottomplatform = this.findBottomMostPlatfrom()
+            if (this.player.y > bottomplatform.y + 200){
+                this.scene.start('game-over')
+            }
         })
 
         const touchingDown = this.player.body.touching.down;
         if (touchingDown) {
             this.player.setVelocityY(-350);
+            this.player.setTexture('bunny-jump')
+        }
+        const vy = this.player.body.velocity.y
+        if(vy > 0 && this.player.texture.key !== touchingDown){
+            this.player.setTexture('bunny-stand')
         }
         if (this.cursors.left.isDown && !touchingDown) {
             this.player.setVelocityX(-200);
@@ -128,10 +141,28 @@ export default class Game extends Phaser.Scene {
          * @param {Carrot} carrot
          */
         handleCollectCarrot(player,carrot){
-            this.carrots.killAndHide(carrot);
-            this.physics.world.disableBody(carrot.body);
+            this.carrots.killAndHide(carrot)
+            this.physics.world.disableBody(carrot.body)
             this.carrotsCollected++
             const value = `Carrots:${this.carrotsCollected}`
             this.carrotsCollectedText.text = value
         }
+
+        findBottomMostPlatfrom(){
+            const platforms = this.platforms.getChildren()
+            let bottomplatform = platforms[0]
+
+            for (let i = 1; i< platforms.length; i++){
+                const platform = platforms[i]
+
+                if (platform.y < bottomplatform.y){
+                    continue
+                }
+                bottomplatform = platform
+            }
+            return bottomplatform;
+        
+        }
+        
+   
 }
